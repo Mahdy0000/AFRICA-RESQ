@@ -24,6 +24,34 @@ all exposed through a FastAPI backend that feeds a real-time **dashboard**.
 | 🗄️ Data engineering | Every detection — from the camera (YOLO) **and** the fake sensor simulator — is automatically persisted to a SQLite store (`data/africa_resq.db`) plus an append-only JSONL export (`data/events.jsonl`), queryable via `/api/events*`. |
 | 🚁 Perception (optional) | YOLO fire/smoke detection pipeline (`src/perception.py`, `live_pipeline.py`, `webcam.py`) for real camera input. |
 
+## Demo
+
+The command dashboard in [`dashboard/`](dashboard/) runs against a rover simulator, so the whole chain (camera, thermal, fusion, risk, safe route) can be seen without hardware. The screenshot below is the dashboard on simulated sensor data.
+
+![AFRICA RESQ command dashboard on simulated data](dashboard/og.jpg)
+
+What the dashboard shows in that frame: a person detected by the camera at 84% and cross-checked against thermal, a risk score of 33/100 (medium) broken down by cause (carbon monoxide, combustible gas, heat, particulates, survivor in D4), and a recommended next action with the safest route.
+
+### Simulator run (from `dashboard/README.md`)
+
+| t | what happens |
+|---|---|
+| 0 s | rover enters at A1, sweeps east along row 1 |
+| 15 s | turns north at D1 and holds to observe |
+| 17 s | camera picks up something person-shaped, far off, logged as an unconfirmed contact |
+| 22 s | thermal array finishes warming, finds a heat signature in the same place |
+| 27 s | fire in D3, directly between the rover and the contact; the gas front arrives |
+| 34 s | D3 is now impassable, the planner offers the long way round |
+| 40 s | rover takes the safe corridor, east then north |
+| 62 s | closes on the survivor; confidence rises as the range falls |
+| 70 s | a second, partly buried contact appears to the west, and ranks below the first |
+
+### Rover design
+
+A low-cost tracked rover sketch (LiDAR, camera, GPS, gas and temperature sensors, Raspberry Pi) is in [`design/`](design/).
+
+![AFRICA RESQ rover sketch](design/rover_sketch.png)
+
 ## System Architecture
 
 ```text
